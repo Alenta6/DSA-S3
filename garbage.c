@@ -13,6 +13,10 @@ void create(int n[], int m) {
     struct Block *t, *p = NULL;
     for (int i = 0; i < m; i++) {
         t = malloc(sizeof(struct Block));
+        if (!t) {
+            printf("Memory allocation failed\n");
+            exit(1);
+        }
         t->size = n[i];
         t->free = 1;
         t->next = NULL;
@@ -27,8 +31,29 @@ void alloc(int s) {
     struct Block *t = head;
     while (t) {
         if (t->free && t->size >= s) {
-            t->free = 0;
-            printf("Allocated process %d in block %d\n", s, t->size);
+            int leftover = t->size - s;
+            t->size = s;    // allocate requested size
+            t->free = 0;    // mark allocated
+
+            if (leftover > 0) {
+                // Create a new block for leftover memory
+                struct Block *newBlock = malloc(sizeof(struct Block));
+                if (!newBlock) {
+                    printf("Memory allocation failed\n");
+                    exit(1);
+                }
+                newBlock->size = leftover;
+                newBlock->free = 1;
+                newBlock->prev = t;
+                newBlock->next = t->next;
+
+                if (t->next) t->next->prev = newBlock;
+                t->next = newBlock;
+
+                printf("Allocated process %d in block %d (leftover memory %d created as new block)\n", s, s, leftover);
+            } else {
+                printf("Allocated process %d in block %d\n", s, s);
+            }
             return;
         }
         t = t->next;
@@ -104,4 +129,6 @@ int main() {
     gc();
     printf("\nAfter GC:");
     display();
+
+    return 0;
 }

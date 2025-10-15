@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <ctype.h>
-#include <stdlib.h>// For atoi
+#include <stdlib.h>
 #include <string.h>
 #define MAX 100
 
@@ -41,16 +41,16 @@ void infixtopostfix(char infix[], char postfix[]) {
     char c;
 
     while ((c = infix[i]) != '\0') {
-        if (isalnum(c)) {  // If it's an operand (variable or digit)
+        if (isalnum(c)) {  
             postfix[j++] = c;
-        } else if (c == '(') {  // Left parenthesis
+        } else if (c == '(') {  
             push(c);
-        } else if (c == ')') {  // Right parenthesis
+        } else if (c == ')') {  
             while (top != -1 && peek() != '(') {
                 postfix[j++] = pop();
             }
-            pop();  // Discard the '('
-        } else if (isOperator(c)) {  // If it's an operator
+            pop();  
+        } else if (isOperator(c)) {  
             while (top != -1 && isOperator(peek()) && precedence(peek()) >= precedence(c)) {
                 postfix[j++] = pop();
             }
@@ -59,12 +59,11 @@ void infixtopostfix(char infix[], char postfix[]) {
         i++;
     }
 
-    // Pop any remaining operators from the stack
     while (top != -1) {
         postfix[j++] = pop();
     }
 
-    postfix[j] = '\0';  // Null-terminate the postfix expression
+    postfix[j] = '\0';  
 }
 
 int evaluatePostfix(char postfix[]) {
@@ -72,12 +71,12 @@ int evaluatePostfix(char postfix[]) {
     int operand1, operand2, result;
     char c;
 
-    top = -1;  // Reset stack for evaluation
+    top = -1;  
 
     while ((c = postfix[i]) != '\0') {
-        if (isdigit(c)) {  // If it's an operand (digit)
-            push(c - '0');  // Convert char to integer
-        } else if (isOperator(c)) {  // If it's an operator
+        if (isdigit(c)) {  
+            push(c - '0');  
+        } else if (isOperator(c)) {  
             operand2 = pop();
             operand1 = pop();
 
@@ -105,29 +104,25 @@ int evaluatePostfix(char postfix[]) {
                     return -1;
             }
 
-            push(result);  // Push the result of the operation back onto the stack
+            push(result);  
         }
         i++;
     }
 
-    return pop();  // The final result will be the only value left in the stack
+    return pop();  
 }
 
 int main() {
     char infix[MAX], postfix[MAX];
     printf("Enter the infix expression: ");
    
-    // Use fgets to read the full expression including spaces
     fgets(infix, MAX, stdin);
-   
-    // Remove the newline character at the end of the input, if present
+
     infix[strcspn(infix, "\n")] = '\0';
    
-    // Convert infix to postfix
     infixtopostfix(infix, postfix);
     printf("The postfix expression is: %s\n", postfix);
    
-    // Evaluate the postfix expression
     int result = evaluatePostfix(postfix);
     printf("The result of the postfix evaluation is: %d\n", result);
    
